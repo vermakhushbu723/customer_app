@@ -1,0 +1,65 @@
+abstract final class Routes {
+  static const onboarding = '/welcome';
+  static const login = '/login';
+  static const otp = '/otp';
+  static const completeProfile = '/complete-profile';
+  static const serviceCheck = '/check-delivery';
+
+  static const home = '/';
+  static const shop = '/shop';
+  static const orders = '/orders';
+  static const wallet = '/wallet';
+  static const account = '/account';
+
+  static const search = '/search';
+  static const favourites = '/favourites';
+  static const cart = '/cart';
+  static const coupons = '/coupons';
+  static const checkout = '/checkout';
+  static const payment = '/payment';
+  static const paymentFailed = '/payment-failed';
+  static const addresses = '/addresses';
+  static const addAddress = '/addresses/add';
+  static const offers = '/offers';
+  static const referral = '/refer-and-earn';
+  static const rewards = '/rewards';
+  static const addMoney = '/wallet/add-money';
+  static const paymentMethods = '/payment-methods';
+  static const subscriptions = '/subscriptions';
+  static const newSubscription = '/subscriptions/new';
+  static const planner = '/ice-planner';
+  static const bulkEnquiry = '/bulk-order';
+  static const enquiries = '/my-enquiries';
+  static const notifications = '/notifications';
+  static const notificationSettings = '/notification-settings';
+  static const help = '/help';
+  static const contact = '/contact';
+  static const tickets = '/tickets';
+  static const newTicket = '/tickets/new';
+  static const issues = '/order-issues';
+  static const editProfile = '/edit-profile';
+  static const settings = '/settings';
+  static const stores = '/stores';
+  static const safety = '/ice-safety';
+  static const feedback = '/feedback';
+  static const about = '/about';
+  static const deleteAccount = '/delete-account';
+
+  static String category(String id) => '/category/$id';
+  static String product(String id) => '/product/$id';
+  static String reviews(String id) => '/product/$id/reviews';
+  static String offer(String code) => '$offers/$code';
+  static String editAddress(String id) => '$addresses/$id';
+  static String order(String id) => '$orders/$id';
+  static String orderPlaced(String id) => '/order-placed/$id';
+  static String track(String id) => '$orders/$id/track';
+  static String bill(String id) => '$orders/$id/bill';
+  static String cancelOrder(String id) => '$orders/$id/cancel';
+  static String rateOrder(String id) => '$orders/$id/rate';
+  static String reportIssue(String id) => '$orders/$id/report';
+  static String issue(String id) => '$issues/$id';
+  static String subscription(String id) => '$subscriptions/$id';
+  static String editSubscription(String id) => '$subscriptions/$id/edit';
+  static String ticket(String id) => '$tickets/$id';
+  static String legal(String page) => '/legal/$page';
+}
