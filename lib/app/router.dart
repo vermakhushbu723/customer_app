@@ -57,12 +57,17 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     redirect: (_, state) {
       final customer = ref.read(authProvider);
-      return redirectFor(
+      final target = redirectFor(
         onboarded: ref.read(onboardingProvider),
         loggedIn: customer != null,
         profileComplete: customer?.profileComplete ?? false,
         location: state.matchedLocation,
       );
+      if (target != null || state.extra != null) return target;
+      // A page reload on the web loses what these two pages were opened with.
+      if (state.matchedLocation == Routes.otp) return Routes.login;
+      if (state.matchedLocation == Routes.payment) return Routes.checkout;
+      return null;
     },
     routes: [
       _page(Routes.onboarding, (_) => const OnboardingScreen()),

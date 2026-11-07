@@ -30,7 +30,8 @@ class ShopScreen extends StatelessWidget {
       ),
       body: GridView.builder(
         padding: AppSpacing.page,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.92),
+        // Two across on any phone, more in a wide browser window.
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 200, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.92),
         itemCount: categories.length,
         itemBuilder: (context, i) => CategoryCard(category: categories[i]),
       ),
