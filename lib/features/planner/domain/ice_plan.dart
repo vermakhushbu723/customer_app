@@ -39,11 +39,14 @@ enum EnquiryStatus {
 }
 
 class BulkEnquiry {
-  const BulkEnquiry({required this.id, required this.eventType, required this.date, required this.quantityKg, required this.location, required this.notes, required this.at, this.status = EnquiryStatus.received, this.quote = ''});
+  const BulkEnquiry({required this.id, required this.eventType, required this.date, this.slot = '', required this.quantityKg, required this.location, required this.notes, required this.at, this.status = EnquiryStatus.received, this.quote = ''});
 
   final String id;
   final String eventType;
   final DateTime date;
+
+  /// The delivery time slot on [date]. Empty on enquiries sent before slots were asked for.
+  final String slot;
   final int quantityKg;
   final String location;
   final String notes;
@@ -53,13 +56,14 @@ class BulkEnquiry {
   /// The price the ICECLUB team sent back.
   final String quote;
 
-  Json toJson() => {'id': id, 'eventType': eventType, 'date': date.toIso8601String(), 'quantityKg': quantityKg, 'location': location, 'notes': notes, 'at': at.toIso8601String(), 'status': status.name, 'quote': quote};
+  Json toJson() => {'id': id, 'eventType': eventType, 'date': date.toIso8601String(), 'slot': slot, 'quantityKg': quantityKg, 'location': location, 'notes': notes, 'at': at.toIso8601String(), 'status': status.name, 'quote': quote};
 
   factory BulkEnquiry.fromJson(Json j) => BulkEnquiry(
     id: j['id'] as String,
     eventType: j['eventType'] as String,
     date: DateTime.parse(j['date'] as String),
-    quantityKg: j['quantityKg'] as int,
+    slot: j['slot'] as String? ?? '',
+    quantityKg: (j['quantityKg'] as num).toInt(),
     location: j['location'] as String,
     notes: j['notes'] as String? ?? '',
     at: DateTime.parse(j['at'] as String),

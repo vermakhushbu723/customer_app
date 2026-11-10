@@ -9,7 +9,9 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/form_fields.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../cart/data/cart_controller.dart';
+import '../../cart/domain/cart_pricing.dart';
 import '../../catalog/data/catalog_data.dart';
 import '../../catalog/domain/product.dart';
 import '../data/enquiries_controller.dart';
@@ -144,6 +146,7 @@ class _BulkEnquiryScreenState extends ConsumerState<BulkEnquiryScreen> {
   final _notes = TextEditingController();
   String? _type;
   DateTime? _date;
+  String? _slot;
 
   @override
   void dispose() {
@@ -156,7 +159,12 @@ class _BulkEnquiryScreenState extends ConsumerState<BulkEnquiryScreen> {
   Future<void> _pickDate() async {
     final today = dateOnly(DateTime.now());
     final picked = await showDatePicker(context: context, initialDate: _date ?? today.add(const Duration(days: 1)), firstDate: today, lastDate: today.add(const Duration(days: 365)));
-    if (picked != null) setState(() => _date = picked);
+    if (picked != null) {
+      setState(() {
+        _date = picked;
+        if (_slot != null && !openSlots(picked, DateTime.now()).any((s) => s.$1 == _slot)) _slot = null;
+      });
+    }
   }
 
   Future<void> _submit() async {
@@ -165,12 +173,17 @@ class _BulkEnquiryScreenState extends ConsumerState<BulkEnquiryScreen> {
       showMessage(context, 'Select the event date', isError: true);
       return;
     }
+    if (_slot == null) {
+      showMessage(context, 'Select a delivery time slot', isError: true);
+      return;
+    }
     try {
       await ref.read(enquiriesProvider.notifier).add(
       BulkEnquiry(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         eventType: _type!,
         date: _date!,
+        slot: _slot!,
         quantityKg: int.parse(_quantity.text),
         location: _location.text.trim(),
         notes: _notes.text.trim(),
@@ -213,6 +226,23 @@ class _BulkEnquiryScreenState extends ConsumerState<BulkEnquiryScreen> {
                 child: OutlinedButton.icon(onPressed: _pickDate, icon: const Icon(Icons.calendar_today_outlined, size: 16), label: Text(_date == null ? 'Select event date' : formatDateShort(_date!))),
               ),
               const SizedBox(height: 14),
+              LabeledField(
+                label: 'Delivery time slot',
+                child: Builder(
+                  builder: (context) {
+                    final slots = _date == null ? AppConstants.deliverySlots : openSlots(_date!, DateTime.now());
+                    if (slots.isEmpty) return const NoticeBanner('No more slots on this day. Please choose another date.');
+                    return Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        for (final (label, _) in slots) ChoiceChip(label: Text(label), selected: _slot == label, onSelected: (_) => setState(() => _slot = label)),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 14),
               AppTextField(label: 'Quantity in kg', controller: _quantity, digitsOnly: true, maxLength: 6, validator: (v) => (int.tryParse(v ?? '') ?? 0) > 0 ? null : 'Enter the quantity'),
               AppTextField(label: 'Delivery location', controller: _location, capitalization: TextCapitalization.words, validator: Validators.required),
               AppTextField(label: 'Notes (optional)', controller: _notes, maxLines: 3),
@@ -252,6 +282,7 @@ class EnquiriesScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           InfoRow('Event date', formatDate(e.date)),
+                          if (e.slot.isNotEmpty) InfoRow('Time slot', e.slot),
                           InfoRow('Quantity', '${e.quantityKg} kg'),
                           InfoRow('Location', e.location),
                           if (e.notes.isNotEmpty) InfoRow('Notes', e.notes),
